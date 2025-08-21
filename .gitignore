@@ -1,0 +1,9 @@
+run
+build/
+.vscode/
+
+.nfs*
+.Trash-*
+.directory
+.fuse_hidden*
+*~
