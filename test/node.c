@@ -1,14 +1,16 @@
+#include "type.h"
+
 typedef enum {
-    EMPTY_NODE,
-    ERROR_NODE,
-    VARIABLE_NODE,
-    ABSTRACTION_NODE,
-    APPLICATION_NODE
+    ERROR_NODE=-2,
+    EMPTY_NODE=-1,
+    VARIABLE_NODE=0,
+    ABSTRACTION_NODE=1,
+    APPLICATION_NODE=2
 } NodeType;
 
 typedef struct Node {
-    i32 value;
     NodeType type;
+    i32 value;
     Node *child[2];
 } Node;
 
@@ -23,13 +25,13 @@ Node *init_node(i32 value, NodeType type) {
 }
 
 void free_node(Node **node) {
-    if(node==NULL) return;
+    if(node==NULL || *node==NULL) return;
     for(usize i=0; i<2; i++){
-        if(node->child[i]==NULL) continue;
-        free_node(node->child[i]);
+        if((*node)->child[i]==NULL) continue;
+        free_node((*node)->child[i]);
     }
-    free(node);
-    node = NULL;
+    free(*node);
+    *node = NULL;
 }
 
 Node *copy_node(Node *src) {
@@ -42,8 +44,9 @@ Node *copy_node(Node *src) {
     return dest;
 }
 
-Node *move_node(Node **src) {
-    Node *dest = *src;
+Node steal_node(Node **src) {
+    Node dest = **src;
+    free(*src);
     *src = NULL;
     return dest;
 }
