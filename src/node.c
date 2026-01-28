@@ -1,105 +1,88 @@
-#include <stdio.h>
 #include <stdlib.h>
-#include <stdarg.h>
-#include "zxl.h"
-#include "state.h"
+#include <stdio.h>
+#include <string.h>
+#include "type.h"
 #include "node.h"
 
-void printNode_impl1(char ch, int color){
-    printf("\033[%dm%c\033[0m", color, ch);
-}
-void printNode_impl0(Node* node){
-    static int colorTb[] = {31, 33, 32, 36, 34, 35};
-    static char exprTb[] = "<|>";
-    static int aCnt = 0, lCnt = 0;
-    int color;
-    if(node == NULL) ZXL_ERROR("now is NULL");
-    switch (node->kind){
-    case VAR_NODE:
-        printf("\033[%dm%d\033[0m", color, node->value);
-        break;
-    case LAM_NODE:
-        color = colorTb[(lCnt) % 6];
-        lCnt++;
-        printNode_impl1(exprTb[0], color);
-        printNode_impl0(node->sons[0]);
-        printNode_impl1(exprTb[2], color);
-        lCnt--;
-        break;
-    case APP_NODE:
-        color = 39;
-        aCnt++;
-        printNode_impl1(exprTb[0], color);
-        printNode_impl0(node->sons[0]);
-        printNode_impl1(exprTb[2], color);
-        printNode_impl1(exprTb[0], color);
-        printNode_impl0(node->sons[1]);
-        printNode_impl1(exprTb[2], color);
-        aCnt--;
-        break;
-    default: ZXL_ERROR("인덱스 누수 발생 %d", node->kind);
-    }
-}
-void printNode(Node* node){
-    printNode_impl0(node);
-    printf("\n");
-    fflush(stdout);
-}
-
-Node* newNode_unhic(Hic, int value, NodeKind kind, Node* lNode, Node* rNode){
-    Node* node = (Node*)allocState(sizeof(Node));
-    node->value = value;
-    node->kind = kind;
-    node->sons[0] = lNode;
-    node->sons[1] = rNode;
+Node *init_node(i32 value, NodeType type) {
+    Node *node = (Node*)malloc(sizeof(Node));
+    *node = (Node){
+        .value = value,
+        .type = type,
+        .child = {NULL, NULL}
+    };
     return node;
 }
-Node* P_unhic(Hic, size_t n, ...){
-    va_list ap; va_start(ap, n);
-    Node* acc = va_arg(ap, Node*);
-    for(size_t i=1; i<n; i++){
-        Node* x = va_arg(ap, Node*);
-        acc = A(acc, x);
+
+void free_node(Node **node) {
+    if(node==NULL || *node==NULL) return;
+    for(usize i=0; i<2; i++){
+        if((*node)->child[i]==NULL) continue;
+        free_node(&((*node)->child[i]));
     }
-    va_end(ap);
-    return acc;
+    free(*node);
+    *node = NULL;
 }
 
-void delNode_unhic(Hic, Node* node){
-    node->value = -1;
-    node->kind = OOO_NODE;
-    node->sons[0] = NULL;
-    node->sons[1] = NULL;
-    node = NULL;
-}
-
-Node* copyNode_unhic(Hic, Node* node){
-    if(node == NULL) ZXL_FATAL("NULL at wrong place");
-    Node* lNode = NULL;
-    Node* rNode = NULL;
-    Node* nNode = NULL;
-    switch (node->kind){
-    case VAR_NODE:
-        break;
-    case LAM_NODE:
-        lNode = copyNode(node->sons[0]);
-        break;
-    case APP_NODE:
-        lNode = copyNode(node->sons[0]);
-        rNode = copyNode(node->sons[1]);
-        break;
-    case OOO_NODE:
-        ZXL_DEBUG("Empty Node Found!");
-        break;
-    default: ZXL_FATAL("Unexpected node kind %d", node->kind);
+Node *copy_node(Node *src) {
+    if(src==NULL) return NULL;
+    Node *dest = init_node(src->value, src->type);
+    for(usize i=0; i<2; i++){
+        if(src->child[i]==NULL) continue;
+        dest->child[i] = copy_node(src->child[i]);
     }
-    nNode = newNode(node->value, node->kind, lNode, rNode);
-    return nNode;
+    return dest;
 }
 
-Node* moveNode_unhic(Hic, Node* nNode, Node* oNode){
-    if(oNode == NULL || nNode == NULL) ZXL_FATAL("NULL at wrong place");
-    *nNode = *oNode;
-    delNode(oNode);
-    return nNode;
+Node steal_node(Node **src) {
+    Node dest = **src;
+    free(*src);
+    *src = NULL;
+    return dest;
+}
+
+static u8 *my_strdup(const u8 *s) {
+    u8 *ret = malloc(strlen(s)+1);
+    if (ret == NULL) return NULL;
+    return memcpy(ret, s, strlen(s)+1);
+}
+
+u8 *node_to_str(Node *node) {
+    u8 str[1024], *left, *right;
+    if (node->type == VARIABLE_NODE) {
+        snprintf(str, sizeof(str), "%d", node->value);
+        return (u8*)my_strdup(str);
+    }
+    if (node->type == ABSTRACTION_NODE) {
+        left = node_to_str(node->child[0]);
+        snprintf(str, sizeof(str), "{\"left\":%s}", left);
+        free(left);
+        return (u8*)my_strdup(str);
+    }
+    if (node->type == APPLICATION_NODE) {
+        left = node_to_str(node->child[0]);
+        right = node_to_str(node->child[1]);
+        snprintf(str, sizeof(str), "{\"left\":%s,\"right\":%s}", left, right);
+        free(left);
+        free(right);
+        return (u8*)my_strdup(str);
+    }
+    return (u8*)my_strdup("");;
+}
+
+Node *variable_node(i32 value) {
+    return init_node(value, VARIABLE_NODE);
+}
+
+Node *abstraction_node(Node *left) {
+    Node *node = init_node(-1, ABSTRACTION_NODE);
+    node->child[0] = left;
+    return node;
+}
+
+Node *application_node(Node *left, Node *right) {
+    Node *node = init_node(-1, APPLICATION_NODE);
+    node->child[0] = left;
+    node->child[1] = right;
+    return node;
 }

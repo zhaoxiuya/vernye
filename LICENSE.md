@@ -26,6 +26,5 @@
    4. 본 라이선스를 위반하는 자는 본 라이선스 문서의 원저작자에 의해 광덕산(8Q988RQQ+GH) 지하에 편도로 초대되며, 위반 사항을 정정할 경우 초대는 취소된다.
    
 # 저작물 표시 목록
-* Copyright (C) 1768208485 zhaoxiuya
+* Copyright (C) 1768208485 zhaoxiuya 
 * Copyright (C) 1768823347 zhaoxiuya
-* Copyright (C) 1768824750 zhaoxiuya
