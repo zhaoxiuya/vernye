@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include "zxl.h"
 #include "type.h"
 #include "node.h"
 #include "beta.h"
