@@ -1,5 +1,39 @@
 #include <stdio.h>
+#include "type.h"
+#include "node.h"
+#include "beta.h"
 
 int main(void){
-    printf("Hello, World!");
+    Node *test;
+    test =
+        application_node(
+            abstraction_node(
+                application_node(
+                    application_node(
+                        variable_node(0),
+                        abstraction_node(
+                            abstraction_node(
+                                variable_node(0)
+                            )
+                        )
+                    ),
+                    abstraction_node(
+                        abstraction_node(
+                            variable_node(1)
+                        )
+                    )
+                )
+            ),
+            abstraction_node(
+                abstraction_node(
+                    variable_node(1)
+                )
+            )
+        );
+    print_node(test);
+    printf("\n");
+    beta_reduce(test);
+    print_node(test);
+    printf("\n");
+    return 0;
 }
