@@ -1,6 +1,7 @@
 #pragma once
 #include <stdarg.h>
 #include <libgen.h>
+#include <type.h>
 
 #define zxl_trace(fmt, ...)\
     zxl_impl(ZXLV_TRACE, basename(__FILE__), __func__, __LINE__, fmt, ##__VA_ARGS__)
@@ -30,4 +31,4 @@ typedef enum {
 
 extern ZXLV ZXLV_FILTER;
 
-void zxl_impl(ZXLV level, const char* file,const char* func, int line, const char* fmt, ...);
+void zxl_impl(ZXLV level, const u8* file,const u8* func, int line, const u8* fmt, ...);
