@@ -25,5 +25,6 @@ void zxl_impl(ZXLV level, const char* file, \
     vfprintf(stderr, fmt, args);
     fprintf(stderr, "\033[0m\n");
     va_end(args);
+    if (level == ZXLV_FATAL ) exit(EXIT_FAILUTE);
     return;
 }
