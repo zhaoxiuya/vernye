@@ -23,7 +23,10 @@ void get_variable_nodes(Node *node, Node ***variables, i32* variables_size, i32 
     if (node == NULL) return;
     if (node->type == VARIABLE_NODE && node->value == depth) {
         if (*variables_size == 0) *variables=(Node**)malloc(sizeof(Node*));
-        else *variables=(Node**)realloc(*variables, sizeof(Node*)*(*variables_size+1));
+        else {
+            *variables=(Node**)realloc(*variables, sizeof(Node*)*(*variables_size+1));
+            if (*variables == NULL) zxl_error("realloc failed");
+        }
         (*variables)[*variables_size]=node;
         (*variables_size)++;
     }
