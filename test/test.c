@@ -30,10 +30,9 @@ int main(void){
                 )
             )
         );
-    print_node(test);
-    printf("\n");
-    beta_reduce(test);
-    print_node(test);
-    printf("\n");
+    printf("%s\n", node_to_str(test));
+    while(!beta_reduce(test)){
+        printf("%s\n", node_to_str(test));
+    }
     return 0;
 }

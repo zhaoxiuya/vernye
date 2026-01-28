@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "type.h"
 #include "node.h"
 
@@ -17,7 +18,7 @@ void free_node(Node **node) {
     if(node==NULL || *node==NULL) return;
     for(usize i=0; i<2; i++){
         if((*node)->child[i]==NULL) continue;
-        free_node((*node)->child[i]);
+        free_node(&((*node)->child[i]));
     }
     free(*node);
     *node = NULL;
@@ -40,21 +41,33 @@ Node steal_node(Node **src) {
     return dest;
 }
 
-void print_node(Node *node) {
+static u8 *my_strdup(const u8 *s) {
+    u8 *ret = malloc(strlen(s)+1);
+    if (ret == NULL) return NULL;
+    return memcpy(ret, s, strlen(s)+1);
+}
+
+u8 *node_to_str(Node *node) {
+    u8 str[1024], *left, *right;
     if (node->type == VARIABLE_NODE) {
-        pritnf("%d", node->value);
+        snprintf(str, sizeof(str), "%d", node->value);
+        return (u8*)my_strdup(str);
     }
     if (node->type == ABSTRACTION_NODE) {
-        printf("[");
-        print_node(node->child[0]);
-        printf("]");
+        left = node_to_str(node->child[0]);
+        snprintf(str, sizeof(str), "{\"left\":%s}", left);
+        free(left);
+        return (u8*)my_strdup(str);
     }
     if (node->type == APPLICATION_NODE) {
-        print_node(node->child[0]);
-        printf("(");
-        print_node(node->child[1]);
-        printf(")");
+        left = node_to_str(node->child[0]);
+        right = node_to_str(node->child[1]);
+        snprintf(str, sizeof(str), "{\"left\":%s,\"right\":%s}", left, right);
+        free(left);
+        free(right);
+        return (u8*)my_strdup(str);
     }
+    return (u8*)my_strdup("");;
 }
 
 Node *variable_node(i32 value) {

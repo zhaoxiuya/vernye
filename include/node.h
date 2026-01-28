@@ -12,14 +12,15 @@ typedef enum {
 typedef struct Node {
     NodeType type;
     i32 value;
-    Node *child[2];
+    struct Node *child[2];
 } Node;
 
 Node *init_node(i32 value, NodeType type);
 void free_node(Node **node);
 Node *copy_node(Node *src);
 Node steal_node(Node **src);
-void print_node(Node *node);
+static u8 *my_strdup(const u8 *s);
+u8 *node_to_str(Node *node);
 Node *variable_node(i32 value);
 Node *abstraction_node(Node *left);
 Node *application_node(Node *left, Node *right);
