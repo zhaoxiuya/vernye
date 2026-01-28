@@ -1,25 +1,36 @@
 #include <stdio.h>
-#include "zxl.h"
-#include "beta.h"
-
-#define oo __INT_MAX__
-
-#define False L(L(V(0)))
-#define True L(L(V(1)))
+#include "vernye.h"
 
 int main(void){
-    ZXL_INIT(ZXLV_FATAL);
-    Hic = newState();
-
-    Node* in = P(2, L(P(3, V(0), False, True)), True);
-    printf("INPUT : ");
-    printNode(in);
-    printf("================================================================\n");
-    Node* out = betaReduce(in);
-    printf("================================================================\n");
-    printf("OUTPUT: ");
-    printNode(out);
-
-    delState();
+    Node *test;
+    test =
+        application_node(
+            abstraction_node(
+                application_node(
+                    application_node(
+                        variable_node(0),
+                        abstraction_node(
+                            abstraction_node(
+                                variable_node(0)
+                            )
+                        )
+                    ),
+                    abstraction_node(
+                        abstraction_node(
+                            variable_node(1)
+                        )
+                    )
+                )
+            ),
+            abstraction_node(
+                abstraction_node(
+                    variable_node(1)
+                )
+            )
+        );
+    printf("%s\n", node_to_str(test));
+    while(!beta_reduce(test)){
+        printf("%s\n", node_to_str(test));
+    }
     return 0;
 }
