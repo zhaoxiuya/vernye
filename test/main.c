@@ -2,8 +2,7 @@
 #include "vernye.h"
 
 int main(void){
-    Node *test;
-    test =
+    Node *test =
         application_node(
             abstraction_node(
                 application_node(

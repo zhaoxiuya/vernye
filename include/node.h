@@ -20,7 +20,7 @@ void free_node(Node **node);
 Node *copy_node(Node *src);
 Node steal_node(Node **src);
 static u8 *my_strdup(const u8 *s);
-u8 *node_to_str(Node *node);
+const u8 *node_to_str(Node *node);
 Node *variable_node(i32 value);
 Node *abstraction_node(Node *left);
 Node *application_node(Node *left, Node *right);

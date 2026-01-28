@@ -47,7 +47,7 @@ static u8 *my_strdup(const u8 *s) {
     return memcpy(ret, s, strlen(s)+1);
 }
 
-u8 *node_to_str(Node *node) {
+const u8 *node_to_str(Node *node) {
     u8 str[1024], *left, *right;
     if (node->type == VARIABLE_NODE) {
         snprintf(str, sizeof(str), "%d", node->value);
