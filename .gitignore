@@ -98,4 +98,6 @@ compile_commands.json
 
 # End of https://www.toptal.com/developers/gitignore/api/c,linux,meson,ninja
 
+/.direnv
 /builddir
+.envrc

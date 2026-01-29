@@ -15,10 +15,6 @@
           gcc gdb
           meson ninja
         ];
-
-        shellHook = ''
-          exec ${pkgs.zsh}/bin/zsh
-        '';
       };
     }
   );
