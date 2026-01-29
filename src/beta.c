@@ -63,13 +63,15 @@ i32 beta_reduce(Node *root) {
     dest = oper->child[0];
     src = redex->child[1];
     get_variable_nodes(dest, &variables, &variables_size, 0);
-    for (usize i=0; i<variables_size; i++) {
-        tmp = copy_node(src);
-        fix_node_value(tmp, variables[i]->value, -1);
-        *variables[i] = steal_node(&tmp);
+    if(variables != NULL) {
+        for (usize i=0; i<variables_size; i++) {
+            tmp = copy_node(src);
+            fix_node_value(tmp, variables[i]->value, -1);
+            *variables[i] = steal_node(&tmp);
+        }
+        free(variables);
     }
     fix_node_value(dest, -1, 0);
-    free(variables);
     redex->child[1] = NULL;
     free_node(&src);
     *redex = steal_node(&dest);
