@@ -3,8 +3,11 @@ project(
   'c',
   meson_version : '>= 1.3.0',
   version : '0.1.0',
-  default_options : ['warning_level=3', 'c_std=c99'],
+  default_options : ['warning_level=3', 'c_std=c99', 'optimization=2'],
 )
+
+cc = meson.get_compiler('c')
+add_project_arguments('-Wno-variadic-macros', language : 'c')
 
 inc = include_directories('include')
 

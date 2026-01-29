@@ -31,4 +31,4 @@ typedef enum {
 
 extern ZXLV ZXLV_FILTER;
 
-void zxl_impl(ZXLV level, const u8* file,const u8* func, int line, const u8* fmt, ...);
+void zxl_impl(ZXLV level, const char* file,const char* func, int line, const char* fmt, ...);

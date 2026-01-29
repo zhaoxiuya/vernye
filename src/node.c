@@ -6,6 +6,7 @@
 
 Node *init_node(i32 value, NodeType type) {
     Node *node = (Node*)malloc(sizeof(Node));
+    if (node == NULL) zxl_fatal("malloc failed", NULL);
     *node = (Node){
         .value = value,
         .type = type,
@@ -41,33 +42,33 @@ Node steal_node(Node **src) {
     return dest;
 }
 
-static u8 *my_strdup(const u8 *s) {
-    u8 *ret = malloc(strlen(s)+1);
+static const char *my_strdup(const char *s) {
+    char *ret = malloc(strlen(s)+1);
     if (ret == NULL) return NULL;
     return memcpy(ret, s, strlen(s)+1);
 }
 
-const u8 *node_to_str(Node *node) {
-    u8 str[1024], *left, *right;
+const char *node_to_str(Node *node) {
+    char str[1024], *left, *right;
     if (node->type == VARIABLE_NODE) {
         snprintf(str, sizeof(str), "%d", node->value);
-        return (u8*)my_strdup(str);
+        return (char*)my_strdup(str);
     }
     if (node->type == ABSTRACTION_NODE) {
-        left = node_to_str(node->child[0]);
+        left = (char*)node_to_str(node->child[0]);
         snprintf(str, sizeof(str), "{\"left\":%s}", left);
         free(left);
-        return (u8*)my_strdup(str);
+        return (char*)my_strdup(str);
     }
     if (node->type == APPLICATION_NODE) {
-        left = node_to_str(node->child[0]);
-        right = node_to_str(node->child[1]);
+        left = (char*)node_to_str(node->child[0]);
+        right = (char*)node_to_str(node->child[1]);
         snprintf(str, sizeof(str), "{\"left\":%s,\"right\":%s}", left, right);
         free(left);
         free(right);
-        return (u8*)my_strdup(str);
+        return (char*)my_strdup(str);
     }
-    return (u8*)my_strdup("");;
+    return (char*)my_strdup("");
 }
 
 Node *variable_node(i32 value) {
@@ -86,3 +87,5 @@ Node *application_node(Node *left, Node *right) {
     node->child[1] = right;
     return node;
 }
+
+//

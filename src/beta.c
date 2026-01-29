@@ -20,13 +20,18 @@ void get_redex_node(Node *node, Node **redex) {
     get_redex_node(right, redex);
 }
 
-void get_variable_nodes(Node *node, Node ***variables, i32* variables_size, i32 depth) {
+void get_variable_nodes(Node *node, Node ***variables, usize* variables_size, i32 depth) {
+    Node **tmp = NULL;
     if (node == NULL) return;
     if (node->type == VARIABLE_NODE && node->value == depth) {
-        if (*variables_size == 0) *variables=(Node**)malloc(sizeof(Node*));
+        if (*variables_size == 0) {
+            *variables=(Node**)malloc(sizeof(Node*));
+            if (*variables == 0) zxl_fatal("malloc failed", NULL);
+        }
         else {
-            *variables=(Node**)realloc(*variables, sizeof(Node*)*(*variables_size+1));
-            if (*variables == NULL) zxl_error("realloc failed");
+            tmp = (Node**)realloc(*variables, sizeof(Node*)*(*variables_size+1));
+            if (tmp == NULL) zxl_fatal("realloc failed", NULL);
+            *variables = tmp;
         }
         (*variables)[*variables_size]=node;
         (*variables_size)++;
@@ -56,7 +61,7 @@ void fix_node_value(Node *node, i32 var_depth, i32 depth) {
 i32 beta_reduce(Node *root) {
     Node *redex=NULL, *oper=NULL, *src=NULL, *dest=NULL, *tmp=NULL;
     Node **variables=NULL;
-    i32 variables_size=0;
+    usize variables_size=0;
     get_redex_node(root, &redex);
     if (redex==NULL) return 1;
     oper = redex->child[0];

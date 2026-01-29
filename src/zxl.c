@@ -7,16 +7,16 @@
 
 ZXLV ZXLV_FILTER = ZXLV_NONE;
 
-void zxl_impl(ZXLV level, const u8* file, \
-    const u8* func, i32 line, const u8* fmt, ...) {
-    static const u8* zxlv_name[] = {
+void zxl_impl(ZXLV level, const char* file, \
+    const char* func, i32 line, const char* fmt, ...) {
+    static const char* zxlv_name[] = {
         "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"
     };
-    static u8 zxlv_color[] = { 34, 36, 32, 33, 31, 35 };
-    if ((level | ZXLV_FILTER) == 0) return;
+    static char zxlv_color[] = { 34, 36, 32, 33, 31, 35 };
+    if ((level | ZXLV_FILTER) == 0) goto msg_end;
     time_t t = time(NULL);
     struct tm *now_tm = localtime(&t);
-    u8 time_str[32];
+    char time_str[32];
     strftime(time_str, sizeof(time_str), "%Y-%m-%d %H:%M:%S", now_tm);
     va_list args;
     va_start(args, fmt);
@@ -26,6 +26,7 @@ void zxl_impl(ZXLV level, const u8* file, \
     vfprintf(stderr, fmt, args);
     fprintf(stderr, "\033[0m\n");
     va_end(args);
+msg_end:
     if (level == ZXLV_FATAL ) exit(EXIT_FAILURE);
     return;
 }
